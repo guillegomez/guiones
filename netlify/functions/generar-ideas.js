@@ -5,6 +5,19 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 // Esta es la función principal que Netlify ejecutará.
 // 'event' contiene la información de la petición que nos llega del frontend.
 exports.handler = async (event) => {
+  const allowedOrigins = [
+    "https://guionesparareels.netlify.app",
+    "http://localhost:8888", // Puerto de desarrollo de Netlify
+  ];
+
+  const origin = event.headers.origin;
+
+  if (!allowedOrigins.includes(origin)) {
+    return {
+      statusCode: 403,
+      body: "Acceso no autorizado desde este origen",
+    };
+  }
   // Nos aseguramos de que solo aceptamos peticiones de tipo POST (más seguro).
   if (event.httpMethod !== "POST") {
     return { statusCode: 405, body: "Method Not Allowed" };
