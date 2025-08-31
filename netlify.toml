@@ -1,0 +1,3 @@
+[build]
+  command = "npm install @google/generative-ai"
+  functions = "netlify/functions"

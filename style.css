@@ -1,0 +1,78 @@
+/* --- Estilos Generales --- */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  background-color: #f4f7f9; /* Un gris muy claro para el fondo */
+  color: #333; /* Color de texto principal oscuro */
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  justify-content: center; /* Centra el contenido horizontalmente */
+  align-items: center; /* Centra el contenido verticalmente */
+  min-height: 100vh; /* Asegura que el cuerpo ocupe toda la altura de la pantalla */
+}
+
+/* --- Contenedor Principal --- */
+main {
+  background-color: #ffffff; /* Fondo blanco para nuestra "tarjeta" */
+  padding: 30px;
+  border-radius: 10px; /* Bordes redondeados */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Una sombra sutil para darle profundidad */
+  max-width: 600px; /* Ancho máximo para que no se estire demasiado en pantallas grandes */
+  width: 100%;
+  box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
+}
+
+/* --- Títulos y Párrafos --- */
+h1 {
+  text-align: center;
+  color: #1a2533;
+  margin-top: 0;
+}
+
+p {
+  text-align: center;
+  color: #5a6777;
+  line-height: 1.6;
+}
+
+/* --- Área de Texto y Botón --- */
+textarea {
+  width: 100%;
+  padding: 15px;
+  font-size: 16px;
+  border: 1px solid #dce1e6;
+  border-radius: 5px;
+  box-sizing: border-box;
+  margin-bottom: 20px;
+  resize: vertical; /* Permite al usuario cambiar la altura */
+  min-height: 100px;
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff;
+  background-color: #007bff; /* Un azul vibrante */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer; /* Cambia el cursor a una mano para indicar que es clickeable */
+  transition: background-color 0.3s ease; /* Transición suave para el cambio de color */
+}
+
+button:hover {
+  background-color: #0056b3; /* Un azul un poco más oscuro al pasar el ratón */
+}
+
+/* --- Área de Resultados --- */
+#resultado {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 5px;
+  line-height: 1.7;
+  white-space: pre-wrap; /* Mantiene los saltos de línea y espacios de la respuesta de la IA */
+}
