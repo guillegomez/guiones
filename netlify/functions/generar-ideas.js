@@ -1,5 +1,8 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-const { RateLimiterRedis } = require("rate-limiter-flexible");
+// --- INICIO DE LA CORRECCIÓN ---
+// Cambiamos la clase que importamos por la específica para Upstash Redis.
+const { RateLimiterUpstashRedis } = require("rate-limiter-flexible");
+// --- FIN DE LA CORRECCIÓN ---
 const { Redis } = require("@upstash/redis");
 
 const redisClient = new Redis({
@@ -7,7 +10,10 @@ const redisClient = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
 });
 
-const rateLimiter = new RateLimiterRedis({
+// --- INICIO DE LA CORRECCIÓN ---
+// Usamos la nueva clase correcta para instanciar el limitador.
+const rateLimiter = new RateLimiterUpstashRedis({
+  // --- FIN DE LA CORRECCIÓN ---
   storeClient: redisClient,
   keyPrefix: "middleware",
   points: 10,
@@ -15,7 +21,6 @@ const rateLimiter = new RateLimiterRedis({
 });
 
 exports.handler = async (event) => {
-  // Lista de orígenes dinámica que se adapta al entorno
   const allowedOrigins = [
     "https://guionesparareels.netlify.app",
     ...(process.env.NODE_ENV === "development"
@@ -25,7 +30,7 @@ exports.handler = async (event) => {
   const origin = event.headers.origin;
 
   const headers = {
-    "Access-Control-Allow-Origin": origin,
+    "Access--Allow-Origin": origin,
     "Access-Control-Allow-Methods": "POST",
     "Access-Control-Allow-Headers": "Content-Type",
   };
@@ -79,19 +84,19 @@ exports.handler = async (event) => {
     const safetySettings = [
       {
         category: "HARM_CATEGORY_HATE_SPEECH",
-        threshold: "BLOCK_LOW_AND_ABOVE",
+        threshold: "BLOCK_MEDIUM_AND_ABOVE",
       },
       {
         category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-        threshold: "BLOCK_LOW_AND_ABOVE",
+        threshold: "BLOCK_MEDIUM_AND_ABOVE",
       },
       {
         category: "HARM_CATEGORY_HARASSMENT",
-        threshold: "BLOCK_LOW_AND_ABOVE",
+        threshold: "BLOCK_MEDIUM_AND_ABOVE",
       },
       {
         category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-        threshold: "BLOCK_LOW_AND_ABOVE",
+        threshold: "BLOCK_MEDIUM_AND_ABOVE",
       },
     ];
 
@@ -107,7 +112,7 @@ exports.handler = async (event) => {
       return {
         statusCode: 429,
         headers,
-        body: "Has realizado demasiadas solicitudes.",
+        body: "Has realizado demasiadas solicitudes. Por favor, espera un momento.",
       };
     }
 
