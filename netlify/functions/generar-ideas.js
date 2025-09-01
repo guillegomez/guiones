@@ -2,7 +2,7 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 exports.handler = async (event) => {
-  // El código de validación de origen que ya tenías sigue aquí
+  // El código de validación de origen sigue igual
   const allowedOrigins = [
     "https://guionesparareels.netlify.app",
     "http://localhost:8888",
@@ -21,12 +21,10 @@ exports.handler = async (event) => {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const { promesa } = JSON.parse(event.body);
 
-    // --- MEJORA 1: VALIDACIÓN Y SANITIZACIÓN DEL INPUT ---
-    // Verificamos que 'promesa' sea un texto y no exceda los 500 caracteres.
-    // Esto evita errores y abusos con inputs demasiado largos o de tipo incorrecto.
+    // La validación de input sigue igual
     if (typeof promesa !== "string" || promesa.length > 500) {
       return {
-        statusCode: 400, // 400 Bad Request es el código correcto para un input inválido.
+        statusCode: 400,
         body: JSON.stringify({
           error:
             "Input inválido. Asegúrate de que sea texto y no exceda los 500 caracteres.",
@@ -34,10 +32,7 @@ exports.handler = async (event) => {
       };
     }
 
-    // --- MEJORA 2: SEGURIDAD DEL PROMPT (PROMPT HARDENING) ---
-    // Estructuramos el prompt para diferenciar claramente las instrucciones del sistema
-    // de la entrada del usuario, y añadimos una meta-instrucción para que ignore
-    // cualquier intento del usuario de cambiar sus órdenes.
+    // La seguridad del prompt sigue igual
     const prompt = `
             [SYSTEM]
             Rol: Eres un estratega de contenido digital y copywriter experto en reels virales. Tu tono es cercano, profesional y seguro.
@@ -51,35 +46,32 @@ exports.handler = async (event) => {
             [/USER_INPUT]
         `;
 
-    // --- MEJORA 3: CONFIGURACIÓN DE SEGURIDAD (SAFETY SETTINGS) ---
-    // Definimos filtros para que el modelo bloquee automáticamente la generación
-    // de contenido dañino, como el discurso de odio.
-    const generationConfig = {
-      safetySettings: [
-        {
-          category: "HARM_CATEGORY_HATE_SPEECH",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE",
-        },
-        {
-          category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE",
-        },
-        {
-          category: "HARM_CATEGORY_HARASSMENT",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE",
-        },
-        {
-          category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-          threshold: "BLOCK_MEDIUM_AND_ABOVE",
-        },
-      ],
-    };
+    // La configuración de seguridad sigue igual
+    const safetySettings = [
+      {
+        category: "HARM_CATEGORY_HATE_SPEECH",
+        threshold: "BLOCK_MEDIUM_AND_ABOVE",
+      },
+      {
+        category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+        threshold: "BLOCK_MEDIUM_AND_ABOVE",
+      },
+      {
+        category: "HARM_CATEGORY_HARASSMENT",
+        threshold: "BLOCK_MEDIUM_AND_ABOVE",
+      },
+      {
+        category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+        threshold: "BLOCK_MEDIUM_AND_ABOVE",
+      },
+    ];
 
-    // Pasamos el prompt y la nueva configuración de seguridad al modelo.
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: prompt }] }],
-      generationConfig, // Aquí aplicamos los filtros de seguridad.
-    });
+    // --- INICIO DE LA CORRECCIÓN ---
+    // Aquí está el cambio. Simplificamos la llamada a 'generateContent'.
+    // Le pasamos el prompt directamente y los 'safetySettings' como segundo argumento.
+    // Este formato es más robusto y es el que corrige el error 500.
+    const result = await model.generateContent(prompt, { safetySettings });
+    // --- FIN DE LA CORRECCIÓN ---
 
     const response = result.response;
     const text = response.text();
