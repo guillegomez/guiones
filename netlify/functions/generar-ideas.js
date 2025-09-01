@@ -1,19 +1,34 @@
-// La importación de Google Generative AI sigue igual
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 exports.handler = async (event) => {
-  // El código de validación de origen sigue igual
   const allowedOrigins = [
     "https://guionesparareels.netlify.app",
     "http://localhost:8888",
   ];
   const origin = event.headers.origin;
+
+  // MEJORA CORS: Definimos las cabeceras una sola vez para reutilizarlas.
+  // Usamos el 'origin' de la petición para ser específicos y seguros.
+  const headers = {
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Methods": "POST",
+    "Access-Control-Allow-Headers": "Content-Type",
+  };
+
   if (!allowedOrigins.includes(origin)) {
-    return { statusCode: 403, body: "Acceso no autorizado desde este origen" };
+    return {
+      statusCode: 403,
+      headers, // MEJORA CORS: Añadimos las cabeceras a la respuesta de error.
+      body: "Acceso no autorizado desde este origen",
+    };
   }
 
   if (event.httpMethod !== "POST") {
-    return { statusCode: 405, body: "Method Not Allowed" };
+    return {
+      statusCode: 405,
+      headers, // MEJORA CORS
+      body: "Method Not Allowed",
+    };
   }
 
   try {
@@ -21,10 +36,10 @@ exports.handler = async (event) => {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const { promesa } = JSON.parse(event.body);
 
-    // La validación de input sigue igual
     if (typeof promesa !== "string" || promesa.length > 500) {
       return {
         statusCode: 400,
+        headers, // MEJORA CORS
         body: JSON.stringify({
           error:
             "Input inválido. Asegúrate de que sea texto y no exceda los 500 caracteres.",
@@ -32,7 +47,6 @@ exports.handler = async (event) => {
       };
     }
 
-    // La seguridad del prompt sigue igual
     const prompt = `
             [SYSTEM]
             Rol: Eres un estratega de contenido digital y copywriter experto en reels virales. Tu tono es cercano, profesional y seguro.
@@ -46,7 +60,6 @@ exports.handler = async (event) => {
             [/USER_INPUT]
         `;
 
-    // La configuración de seguridad sigue igual
     const safetySettings = [
       {
         category: "HARM_CATEGORY_HATE_SPEECH",
@@ -66,22 +79,21 @@ exports.handler = async (event) => {
       },
     ];
 
-    // --- INICIO DE LA CORRECCIÓN ---
-    // Aquí está el cambio. Simplificamos la llamada a 'generateContent'.
-    // Le pasamos el prompt directamente y los 'safetySettings' como segundo argumento.
-    // Este formato es más robusto y es el que corrige el error 500.
     const result = await model.generateContent(prompt, { safetySettings });
-    // --- FIN DE LA CORRECCIÓN ---
-
     const response = result.response;
     const text = response.text();
 
     return {
       statusCode: 200,
+      headers, // MEJORA CORS
       body: JSON.stringify({ reply: text }),
     };
   } catch (error) {
     console.error("Error al llamar a la API de Gemini:", error);
-    return { statusCode: 500, body: "Error interno al procesar la solicitud." };
+    return {
+      statusCode: 500,
+      headers, // MEJORA CORS
+      body: "Error interno al procesar la solicitud.",
+    };
   }
 };
