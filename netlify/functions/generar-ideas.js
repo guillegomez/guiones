@@ -1,8 +1,12 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
 // --- INICIO DE LA CORRECCIÓN ---
-// Cambiamos la clase que importamos por la específica para Upstash Redis.
-const { RateLimiterUpstashRedis } = require("rate-limiter-flexible");
+// Corregimos la forma en que importamos las clases. En lugar de una línea por cada una,
+// las extraemos del objeto principal que exporta la librería.
+const {
+  RateLimiterRedis,
+  RateLimiterUpstashRedis,
+} = require("rate-limiter-flexible");
 // --- FIN DE LA CORRECCIÓN ---
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 const { Redis } = require("@upstash/redis");
 
 const redisClient = new Redis({
@@ -10,10 +14,7 @@ const redisClient = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
 });
 
-// --- INICIO DE LA CORRECCIÓN ---
-// Usamos la nueva clase correcta para instanciar el limitador.
 const rateLimiter = new RateLimiterUpstashRedis({
-  // --- FIN DE LA CORRECCIÓN ---
   storeClient: redisClient,
   keyPrefix: "middleware",
   points: 10,
@@ -30,7 +31,10 @@ exports.handler = async (event) => {
   const origin = event.headers.origin;
 
   const headers = {
-    "Access--Allow-Origin": origin,
+    // --- INICIO DE LA CORRECCIÓN ---
+    // Corregido el error de tipeo: 'Access-Control-Allow-Origin'.
+    "Access-Control-Allow-Origin": origin,
+    // --- FIN DE LA CORRECCIÓN ---
     "Access-Control-Allow-Methods": "POST",
     "Access-Control-Allow-Headers": "Content-Type",
   };
